@@ -1,21 +1,23 @@
 import { useEffect } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { AssistantApp, FinderApp, SettingsApp, TerminalApp, TextEditApp, TrashApp } from '../apps/Apps'
+import { DrawingApp, PianoApp } from '../apps/CreativeApps'
 import { SafariApp } from '../apps/SafariApp'
 import { Dock } from './Dock'
 import { MenuBar } from './MenuBar'
 import { VoiceControl } from './VoiceControl'
 import { AssistantCursor } from './AssistantCursor'
 import { Window } from './Window'
+import { LockScreen } from './LockScreen'
 import { AssistantConfirmation, MissionControl, NotificationCenter, OSDialogs, Spotlight } from './SystemOverlays'
 import { useSystemStore } from './store'
 import type { AppId } from './types'
 
-const appIds: AppId[] = ['finder', 'safari', 'textedit', 'terminal', 'settings', 'assistant', 'trash']
-const appComponents: Record<AppId, () => React.JSX.Element> = { finder: FinderApp, safari: SafariApp, textedit: TextEditApp, terminal: TerminalApp, settings: SettingsApp, assistant: AssistantApp, trash: TrashApp }
+const appIds: AppId[] = ['finder', 'safari', 'textedit', 'terminal', 'settings', 'assistant', 'trash', 'piano', 'drawing']
+const appComponents: Record<AppId, () => React.JSX.Element> = { finder: FinderApp, safari: SafariApp, textedit: TextEditApp, terminal: TerminalApp, settings: SettingsApp, assistant: AssistantApp, trash: TrashApp, piano: PianoApp, drawing: DrawingApp }
 
 export function Desktop() {
-  const { windows, darkMode, autoAppearance, reduceMotion, highContrast, wallpaper, accentColor, brightness, showDesktopIcons, openApp, updatePreferences } = useSystemStore(useShallow((state) => ({ windows: state.windows, darkMode: state.darkMode, autoAppearance: state.autoAppearance, reduceMotion: state.reduceMotion, highContrast: state.highContrast, wallpaper: state.wallpaper, accentColor: state.accentColor, brightness: state.brightness, showDesktopIcons: state.showDesktopIcons, openApp: state.openApp, updatePreferences: state.updatePreferences })))
+  const { windows, darkMode, autoAppearance, reduceMotion, highContrast, wallpaper, accentColor, brightness, showDesktopIcons, locked, setLocked, openApp, updatePreferences } = useSystemStore(useShallow((state) => ({ windows: state.windows, darkMode: state.darkMode, autoAppearance: state.autoAppearance, reduceMotion: state.reduceMotion, highContrast: state.highContrast, wallpaper: state.wallpaper, accentColor: state.accentColor, brightness: state.brightness, showDesktopIcons: state.showDesktopIcons, locked: state.locked, setLocked: state.setLocked, openApp: state.openApp, updatePreferences: state.updatePreferences })))
   useEffect(() => {
     if (!Object.values(windows).some((window) => window.open)) openApp('finder')
   }, [])
@@ -36,6 +38,7 @@ export function Desktop() {
         }
         return
       }
+      if (event.ctrlKey && event.metaKey && event.key.toLowerCase() === 'q') { event.preventDefault(); store.setLocked(true); return }
       if (event.metaKey && event.code === 'Space') { event.preventDefault(); store.setSpotlightOpen(true); return }
       if ((event.key === 'F3' || (event.ctrlKey && event.key === 'ArrowUp')) && !event.metaKey) { event.preventDefault(); store.setMissionControlOpen(!store.missionControlOpen); return }
       if (event.ctrlKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
@@ -80,6 +83,7 @@ export function Desktop() {
       <NotificationCenter />
       <AssistantConfirmation />
       <OSDialogs />
+      {locked && <LockScreen onUnlock={() => setLocked(false)} />}
     </main>
   )
 }

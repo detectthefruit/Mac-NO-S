@@ -1,4 +1,4 @@
-export type AppId = 'finder' | 'safari' | 'textedit' | 'terminal' | 'settings' | 'assistant' | 'trash'
+export type AppId = 'finder' | 'safari' | 'textedit' | 'terminal' | 'settings' | 'assistant' | 'trash' | 'piano' | 'drawing'
 export type EntryType = 'folder' | 'file'
 
 export interface FsEntry {
@@ -49,6 +49,8 @@ export const appNames: Record<AppId, string> = {
   settings: 'System Settings',
   assistant: 'Mac Assistant',
   trash: 'Trash',
+  piano: 'Piano',
+  drawing: 'Drawing',
 }
 
 export const appFrames: Record<AppId, WindowFrame> = {
@@ -59,4 +61,6 @@ export const appFrames: Record<AppId, WindowFrame> = {
   settings: { x: 170, y: 75, width: 810, height: 585 },
   assistant: { x: 260, y: 95, width: 700, height: 600 },
   trash: { x: 210, y: 110, width: 720, height: 510 },
+  piano: { x: 185, y: 90, width: 880, height: 550 },
+  drawing: { x: 170, y: 75, width: 900, height: 600 },
 }

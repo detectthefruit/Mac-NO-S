@@ -46,6 +46,8 @@ interface SystemState {
   showDesktopIcons: boolean
   dockMagnification: boolean
   assistantControlEnabled: boolean
+  locked: boolean
+  setLocked: (locked: boolean) => void
   openApp: (id: AppId) => void
   closeApp: (id: AppId) => void
   minimizeApp: (id: AppId) => void
@@ -118,6 +120,8 @@ export const useSystemStore = create<SystemState>()(persist((set, get) => ({
   showDesktopIcons: true,
   dockMagnification: true,
   assistantControlEnabled: true,
+  locked: false,
+  setLocked: (locked) => set({ locked }),
   openApp: (id) => set((state) => {
     const zIndex = state.nextZ
     const spaceId = state.windows[id].open ? state.windowSpaces[id] ?? state.activeSpaceId : state.activeSpaceId

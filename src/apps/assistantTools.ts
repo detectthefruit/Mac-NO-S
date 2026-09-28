@@ -8,14 +8,18 @@ export const assistantTools = [{
   type: 'function',
   function: {
     name: 'control_os',
-    description: 'Carry out desktop tasks through the visible Dock, Finder, TextEdit, or other app interface. Ask before moving an item to Trash.',
+    description: 'Carry out desktop tasks through visible app interfaces. Use piano_play to perform note names such as C4,E4,G4 at a chosen tempo. Use drawing_create to draw with a compact drawing string: separate strokes with semicolons; each stroke is #RRGGBB:width:x,y x,y with 0-100 canvas coordinates. Ask before moving an item to Trash.',
     parameters: {
       type: 'object',
       properties: {
-        action: { type: 'string', enum: ['open_app', 'create_file', 'create_folder', 'read_file', 'list_files', 'move_to_trash'] },
-        app: { type: 'string', enum: ['finder', 'safari', 'textedit', 'terminal', 'settings', 'assistant', 'trash'] },
+        action: { type: 'string', enum: ['open_app', 'create_file', 'create_folder', 'read_file', 'list_files', 'move_to_trash', 'piano_play', 'drawing_create'] },
+        app: { type: 'string', enum: ['finder', 'safari', 'textedit', 'terminal', 'settings', 'assistant', 'trash', 'piano', 'drawing'] },
         path: { type: 'string' },
         content: { type: 'string' },
+        notes: { type: 'string', description: 'Comma-separated piano notes in octave 4 or 5, for example C4,E4,G4,C5.' },
+        tempo: { type: 'integer', minimum: 50, maximum: 180 },
+        title: { type: 'string', description: 'Optional title for the drawing.' },
+        drawing: { type: 'string', description: 'Compact drawing paths, each stroke formatted #RRGGBB:width:x,y x,y and strokes separated by semicolons. Use 3-8 points per stroke and 3-8 strokes total. Coordinates are 0-100.' },
       },
       required: ['action'],
     },
@@ -27,6 +31,10 @@ interface ToolArgs {
   app?: AppId
   path?: string
   content?: string
+  notes?: string
+  tempo?: number
+  title?: string
+  drawing?: string
 }
 
 const inFlight = new Map<string, Promise<string>>()
@@ -46,7 +54,7 @@ export async function executeAssistantTool(raw: string) {
   try { args = JSON.parse(raw) as ToolArgs } catch { return 'The assistant returned an invalid command.' }
   const os = useSystemStore.getState()
   if (!os.assistantControlEnabled) return 'Desktop control is disabled in Privacy & Security settings.'
-  const appIds: AppId[] = ['finder', 'safari', 'textedit', 'terminal', 'settings', 'assistant', 'trash']
+  const appIds: AppId[] = ['finder', 'safari', 'textedit', 'terminal', 'settings', 'assistant', 'trash', 'piano', 'drawing']
   if (args.action === 'open_app' && (!args.app || !appIds.includes(args.app))) return 'That app is not available.'
   if (args.action === 'move_to_trash' && args.path) {
     const approved = await requestAssistantConfirmation('Move to Trash?', `Mac Assistant wants to move ${args.path} to the Trash.`)

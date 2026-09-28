@@ -6,6 +6,29 @@ type AssistantUiCommand = {
   app?: AppId
   path?: string
   content?: string
+  notes?: string
+  tempo?: number
+  title?: string
+  drawing?: string
+}
+
+function parseDrawing(value: string) {
+  return value.split(';').slice(0, 40).flatMap((stroke) => {
+    const [colorValue, widthValue, ...coordinateParts] = stroke.trim().split(':')
+    const coordinates = coordinateParts.join(':').trim().split(/\s+/).slice(0, 150)
+    const points = coordinates.flatMap((coordinate) => {
+      const match = /^(\d+(?:\.\d+)?),(\d+(?:\.\d+)?)$/.exec(coordinate)
+      if (!match) return []
+      return [{ x: Math.max(0, Math.min(100, Number(match[1]))), y: Math.max(0, Math.min(100, Number(match[2]))) }]
+    })
+    if (points.length < 2) return []
+    const width = Number(widthValue)
+    return [{
+      color: /^#[\da-f]{6}$/i.test(colorValue) ? colorValue : '#20232b',
+      width: Number.isFinite(width) ? Math.max(0.4, Math.min(4, width)) : 1.6,
+      points,
+    }]
+  })
 }
 
 const wait = (milliseconds: number) => new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds))
@@ -134,6 +157,20 @@ async function createEntry(command: AssistantUiCommand) {
 
 export async function performVisibleAssistantCommand(command: AssistantUiCommand): Promise<string> {
   try {
+    if (command.action === 'piano_play' && command.notes) {
+      const notes = command.notes.split(/[\s,;]+/).map((note) => note.trim()).filter((note) => /^[A-G]#?[45]$/.test(note)).slice(0, 48)
+      if (!notes.length) throw new Error('Choose piano notes in the C4–B5 range.')
+      await openVisibleApp('piano')
+      await new Promise<void>((resolve) => window.dispatchEvent(new CustomEvent('mac-piano-play', { detail: { notes: notes.join(','), tempo: Math.max(50, Math.min(180, command.tempo ?? 100)), complete: resolve } })))
+      return `Played ${notes.length} notes on the Piano.`
+    }
+    if (command.action === 'drawing_create' && command.drawing) {
+      const strokes = parseDrawing(command.drawing)
+      if (!strokes.length) throw new Error('I could not parse the drawing paths. Use #RRGGBB:width:x,y x,y for each semicolon-separated stroke.')
+      await openVisibleApp('drawing')
+      await new Promise<void>((resolve) => window.dispatchEvent(new CustomEvent('mac-drawing-create', { detail: { title: command.title, strokes, complete: resolve } })))
+      return `Drew ${strokes.length} strokes in Drawing.`
+    }
     if (command.action === 'open_app' && command.app) {
       await openVisibleApp(command.app)
       return `Opened ${command.app}.`

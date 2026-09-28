@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
-import { Bot, Compass, FileText, Folder, Settings, Terminal, Trash2 } from 'lucide-react'
+import { Bot, Compass, FileText, Folder, Music2, Paintbrush, Settings, Terminal, Trash2 } from 'lucide-react'
 import { useSystemStore } from './store'
 import type { AppId } from './types'
 
@@ -12,6 +12,8 @@ const items: { id: AppId; label: string; icon: typeof Folder; color: string }[] 
   { id: 'assistant', label: 'Mac Assistant', icon: Bot, color: 'assistant-icon' },
   { id: 'settings', label: 'System Settings', icon: Settings, color: 'settings-icon' },
   { id: 'trash', label: 'Trash', icon: Trash2, color: 'settings-icon' },
+  { id: 'piano', label: 'Piano', icon: Music2, color: 'piano-icon' },
+  { id: 'drawing', label: 'Drawing', icon: Paintbrush, color: 'drawing-icon' },
 ]
 
 export function Dock() {

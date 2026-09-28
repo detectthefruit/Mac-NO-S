@@ -16,6 +16,9 @@ import './app-workflows.css'
 import './os-dialogs.css'
 import './genie-minimize.css'
 import './system-preferences.css'
+import './creative-apps.css'
+import './lock-screen-type.css'
+import './creative-dock.css'
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {

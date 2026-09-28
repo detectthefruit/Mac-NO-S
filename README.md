@@ -11,7 +11,7 @@ npm run dev:full
 
 Open the Vite URL shown in the terminal. To install the PWA locally, run `npm run build` followed by `npm run preview:full`, then open `http://localhost:4173` in a supported browser and use its Install control. Service-worker installation is enabled in production builds, not the Vite development server. To run only the desktop, use `npm run dev`; Safari's proxy browsing requires `npm run server` in a second terminal. The proxy only accepts public HTTP(S) hosts and limits responses to 12 MB. Websites can still behave differently from a native browser, and the proxy does not guarantee compatibility with every site.
 
-Mac Assistant defaults to Groq's `qwen/qwen3-32b` tool-capable chat model, discovers the models available to your key, and sends requests through the local Express `/api/assistant` route to avoid browser CORS failures. Add a Groq API key in the assistant's settings; it is held in session storage and forwarded per request, never persisted by the backend. Do not use a shared or untrusted browser profile for API keys.
+Mac Assistant defaults to Groq's `qwen/qwen3-32b` tool-capable chat model, discovers the models available to your key, and sends requests through the local Express `/api/assistant` route to avoid browser CORS failures. Add a Groq API key in the assistant's settings; it is held in session storage and forwarded per request, never persisted by the backend. The assistant can open Piano and perform note sequences, or create polylines in Drawing. Do not use a shared or untrusted browser profile for API keys.
 
 Use the screen icon in the menu bar to ask Mac Assistant to analyze a shared screen, window, or tab. The browser displays its normal share picker; the app captures and sends one downscaled frame to an available vision-capable Groq model, then immediately stops the capture. Screen sharing is never kept running in the background.
 
@@ -23,7 +23,7 @@ Hey Mac voice control requires microphone permission and a browser with Web Spee
 2. **State manager:** window focus, z-order, visibility, frame, appearance, wallpaper, and the virtual filesystem are managed centrally in `src/system/store.ts`.
 3. **Window manager:** `Window.tsx` implements dragging, edge/corner resizing, minimize, maximize, and close controls.
 4. **Desktop shell:** `Desktop.tsx`, `MenuBar.tsx`, and `Dock.tsx` compose the desktop, status controls, app menus, dock, and custom pointer/drag/resize cursors.
-5. **Built-in apps:** Finder, Terminal, TextEdit, Settings, Safari, and Mac Assistant use the shared OS store. Assistant tool calls can open apps and read or write virtual files; assistant access can be disabled in Privacy & Security.
+5. **Built-in apps:** Finder, Terminal, TextEdit, Settings, Safari, Piano, Drawing, and Mac Assistant use the shared OS store. Assistant tool calls can open apps, read or write virtual files, play piano notes, and draw; assistant access can be disabled in Privacy & Security. Lock the desktop from the Apple menu or with Control-Command-Q; press Enter or click the user to unlock.
 6. **Safari proxy:** `server/index.ts` validates public destinations and redirects, bounds response size/time, and rewrites HTML, CSS imports, inline styles, and responsive image URLs through the proxy. It is a basic browsing bridge, not a hardened general-purpose web gateway.
 
 ## Proxy boundaries
